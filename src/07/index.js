@@ -38,9 +38,13 @@ const resetPosition = assign({
   py: 0,
 });
 
+const isAuthorized = (context) => {
+  return context.user !== undefined;
+}
+
 const dragDropMachine = createMachine({
   // The initial state should check auth status instead.
-  initial: 'idle',
+  initial: 'checkingAuth',
   context: {
     x: 0,
     y: 0,
@@ -48,12 +52,26 @@ const dragDropMachine = createMachine({
     dy: 0,
     px: 0,
     py: 0,
-    user: undefined,
+    user: 2,
   },
   states: {
     // Add two states:
     // - checkingAuth (with transient transitions)
     // - unauthorized
+    checkingAuth: {
+      on: {
+        '': [
+          {
+            target: 'idle',
+            cond: isAuthorized,
+          },
+          {
+            target: 'unauthorized',
+          },
+        ],
+      }
+    },
+    unauthorized: {},
     idle: {
       on: {
         mousedown: {

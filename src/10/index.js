@@ -10,15 +10,29 @@ const displayMachine = createMachine({
   states: {
     hidden: {
       on: {
-        TURN_ON: 'visible',
+        TURN_ON: 'visible.hist',
       },
     },
     visible: {
       // Add hierarchical states for light/dark mode.
-      // ...
+      initial: 'light',
+      states: {
+        light: {
+          on: {
+            SWITCH: 'dark',
+          }
+        },
+        dark: {
+          on: {
+            SWITCH: 'light',
+          },
+        },
+        hist: {
+          type: 'history',
+        },
+      },
 
       // Then, add a history state that remembers which mode we used.
-      // ...
       on: {
         TURN_OFF: 'hidden',
       },

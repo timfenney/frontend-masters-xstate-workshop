@@ -25,16 +25,28 @@ const machine = createMachine({
     pending: {
       invoke: {
         // Invoke your promise here.
-        // The `src` should be a function that returns the source.
+        src: (context, event) => randomFetch(),
+        onDone: 'resolved',
+        onError: 'rejected',
       },
     },
     resolved: {
       // Add a transition to fetch again
+      after: {
+        TIMEOUT: 'idle',
+      },
     },
     rejected: {
       // Add a transition to fetch again
+      after: {
+        TIMEOUT: 'idle',
+      },
     },
   },
+},{
+  delays: {
+    TIMEOUT: 1500,
+  }
 });
 
 const service = interpret(machine);

@@ -73,9 +73,18 @@ const dragDropMachine = createMachine({
       },
       // Transition to 'idle' after 2 seconds
       // using a delayed transition.
-      // ...
+      after: {
+        TIMEOUT: {
+          actions: resetPosition,
+          target: 'idle',
+        },
+      },
     },
   },
+},{
+  delays: {
+    TIMEOUT: 2000,
+  }
 });
 
 const service = interpret(dragDropMachine);

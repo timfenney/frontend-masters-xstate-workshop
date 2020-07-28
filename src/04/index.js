@@ -2,9 +2,23 @@ import { createMachine, interpret } from 'xstate';
 
 const elBox = document.querySelector('#box');
 
+
+const derivedState = {
+  state: [],
+};
+
 const setPoint = (context, event) => {
   // Set the data-point attribute of `elBox`
-  // ...
+  const x = event.clientX;
+  const y = event.clientY;
+  const formattedPoint = `Point(${x},${y})`;
+  derivedState.state.push(formattedPoint);
+  if (derivedState.state.length === 2) {
+    elBox.setAttribute('data-point', derivedState.state.join('-->'));
+    derivedState.state = [];
+  } else {
+    elBox.setAttribute('data-point', formattedPoint);
+  }
 };
 
 const machine = createMachine({
@@ -14,7 +28,7 @@ const machine = createMachine({
       on: {
         mousedown: {
           // Add your action here
-          // ...
+          actions: setPoint,
           target: 'dragging',
         },
       },
@@ -22,6 +36,7 @@ const machine = createMachine({
     dragging: {
       on: {
         mouseup: {
+          actions: setPoint,
           target: 'idle',
         },
       },
@@ -39,9 +54,7 @@ service.onTransition((state) => {
 
 service.start();
 
-elBox.addEventListener('mousedown', (event) => {
-  service.send(event);
-});
+elBox.addEventListener('mousedown', service.send);
 
 elBox.addEventListener('mouseup', (event) => {
   service.send(event);
